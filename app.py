@@ -5,8 +5,13 @@ import os
 app = Flask(__name__)
 
 def load_data():
+    # Pastikan path benar untuk lokal dan cloud
     filepath = os.path.join('data', 'sample_data.csv')
-    return pd.read_csv(filepath)
+    try:
+        return pd.read_csv(filepath)
+    except Exception as e:
+        print(f"Error loading data: {e}")
+        return pd.DataFrame()
 
 @app.route('/')
 def index():
@@ -14,7 +19,7 @@ def index():
         data = load_data()
         return render_template('index.html', data=data.head(5))
     except Exception as e:
-        return f"<h3>Error: {str(e)}</h3>"
+        return f"<h3>Error: {str(e)}</h3><br><a href='/'>Refresh</a>"
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -54,4 +59,4 @@ def predict():
         return f"<h3>Error: {str(e)}</h3><br><a href='/'>Kembali</a>"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
